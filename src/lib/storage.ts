@@ -1,8 +1,19 @@
-import { kv } from "@vercel/kv"
+import { createClient } from "redis"
 import path from "path"
 import fs from "fs/promises"
 
 const REDIS_KEY = "profile"
+
+let client: ReturnType<typeof createClient> | null = null
+
+async function getRedis() {
+  if (!client) {
+    client = createClient({ url: process.env.REDIS_URL })
+    client.on("error", (err) => console.error("Redis Error:", err))
+    await client.connect()
+  }
+  return client
+}
 
 async function readFile(): Promise<ProfileData | null> {
   try {
@@ -15,12 +26,13 @@ async function readFile(): Promise<ProfileData | null> {
 }
 
 async function seedIfEmpty(): Promise<ProfileData> {
-  const existing = await kv.get<ProfileData>(REDIS_KEY)
-  if (existing) return existing
+  const redis = await getRedis()
+  const raw = await redis.get(REDIS_KEY)
+  if (raw) return JSON.parse(raw) as ProfileData
 
   const fileData = await readFile()
   if (fileData) {
-    await kv.set(REDIS_KEY, fileData)
+    await redis.set(REDIS_KEY, JSON.stringify(fileData))
     return fileData
   }
 
@@ -70,5 +82,6 @@ export async function readData(): Promise<ProfileData> {
 }
 
 export async function writeData(data: ProfileData): Promise<void> {
-  await kv.set(REDIS_KEY, data)
+  const redis = await getRedis()
+  await redis.set(REDIS_KEY, JSON.stringify(data))
 }
