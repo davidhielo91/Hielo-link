@@ -1,7 +1,31 @@
+import { kv } from "@vercel/kv"
 import path from "path"
 import fs from "fs/promises"
 
-const DATA_FILE = path.join(process.cwd(), "src", "data", "profile.json")
+const REDIS_KEY = "profile"
+
+async function readFile(): Promise<ProfileData | null> {
+  try {
+    const DATA_FILE = path.join(process.cwd(), "src", "data", "profile.json")
+    const raw = await fs.readFile(DATA_FILE, "utf-8")
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
+
+async function seedIfEmpty(): Promise<ProfileData> {
+  const existing = await kv.get<ProfileData>(REDIS_KEY)
+  if (existing) return existing
+
+  const fileData = await readFile()
+  if (fileData) {
+    await kv.set(REDIS_KEY, fileData)
+    return fileData
+  }
+
+  throw new Error("No data found in Redis or file")
+}
 
 export type ProfileData = {
   name: string
@@ -42,10 +66,9 @@ export type Social = {
 }
 
 export async function readData(): Promise<ProfileData> {
-  const raw = await fs.readFile(DATA_FILE, "utf-8")
-  return JSON.parse(raw)
+  return seedIfEmpty()
 }
 
 export async function writeData(data: ProfileData): Promise<void> {
-  await fs.writeFile(DATA_FILE, JSON.stringify(data, null, 2), "utf-8")
+  await kv.set(REDIS_KEY, data)
 }
