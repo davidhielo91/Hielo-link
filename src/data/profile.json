@@ -1,0 +1,53 @@
+{
+  "name": "Tu Nombre",
+  "bio": "Creador de contenido · Desarrollador · Viajero",
+  "avatar": null,
+  "theme": {
+    "bgFrom": "#7c3aed",
+    "bgVia": "#ec4899",
+    "bgTo": "#fb923c",
+    "cardBg": "rgba(255,255,255,0.1)",
+    "cardBorder": "rgba(255,255,255,0.2)",
+    "cardBgHover": "rgba(255,255,255,0.2)",
+    "textPrimary": "#ffffff",
+    "textSecondary": "rgba(255,255,255,0.7)",
+    "textMuted": "rgba(255,255,255,0.4)",
+    "ringColor": "rgba(255,255,255,0.2)",
+    "socialBg": "rgba(255,255,255,0.1)",
+    "socialColor": "rgba(255,255,255,0.7)",
+    "socialHoverBg": "rgba(255,255,255,0.2)",
+    "socialHoverColor": "#ffffff"
+  },
+  "links": [
+    {
+      "id": "link-1",
+      "title": "Mi Canal de YouTube",
+      "url": "https://youtube.com/@tucanal",
+      "icon": "🎬"
+    },
+    {
+      "id": "link-2",
+      "title": "Sígueme en Instagram",
+      "url": "https://instagram.com/tuusuario",
+      "icon": "📸"
+    },
+    {
+      "id": "link-3",
+      "title": "Último Proyecto en GitHub",
+      "url": "https://github.com/tuusuario/proyecto",
+      "icon": "💻"
+    },
+    {
+      "id": "link-4",
+      "title": "Escríbeme un Email",
+      "url": "mailto:hola@tudominio.com",
+      "icon": "✉️"
+    }
+  ],
+  "socials": [
+    { "platform": "youtube", "url": "https://youtube.com/@tucanal" },
+    { "platform": "instagram", "url": "https://instagram.com/tuusuario" },
+    { "platform": "twitter", "url": "https://twitter.com/tuusuario" },
+    { "platform": "github", "url": "https://github.com/tuusuario" }
+  ]
+}
