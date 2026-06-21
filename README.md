@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Hielink
 
-## Getting Started
+Link-in-Bio page personalizable. Sin depender de Linktree, Beacons, ni Carrd.
 
-First, run the development server:
+**Stack**: Next.js 16, React 19, Tailwind CSS 4, TypeScript, Redis.
+
+## Características
+
+- 10 temas visuales (Dracula, Tokyo Night, Catppuccin, etc.)
+- Gradiente animado en fondo (toggle)
+- Efecto 3D tilt en tarjetas
+- Bio con efecto de escritura automática
+- Drag & drop para reordenar enlaces
+- Selector visual de iconos de redes sociales
+- Pairing de fuentes (títulos + cuerpo)
+- Botón de agenda (Calendly / Cal.com)
+- Login con contraseña (personalizable desde el admin)
+- Rate limiting + validación Zod + headers de seguridad
+
+## Requisitos
+
+- Node.js 22+
+- Redis (Upstash o local)
+
+## Variables de entorno
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+ADMIN_PASSWORD=tu-contraseña
+JWT_SECRET=tu-secreto-jwt
+REDIS_URL=redis://default:password@host:port
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ver `.env.example`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Instalación
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+Abrir [http://localhost:3000](http://localhost:3000).
 
-To learn more about Next.js, take a look at the following resources:
+El admin está en `/admin`. La primera vez se crean datos de ejemplo desde `src/data/profile.json`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Comandos
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Comando | Descripción |
+|---------|-------------|
+| `npm run dev` | Servidor de desarrollo |
+| `npm run build` | Build de producción |
+| `npm run lint` | ESLint (flat config) |
+| `npx tsc --noEmit` | TypeScript check |
 
-## Deploy on Vercel
+## Deploy en Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Conecta el repo y agrega las 3 variables de entorno en el dashboard.
