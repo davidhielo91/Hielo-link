@@ -1,18 +1,7 @@
 import { randomBytes, scryptSync, timingSafeEqual } from "crypto"
-import { createClient } from "redis"
+import { getRedis } from "@/lib/redis"
 
 const REDIS_KEY = "admin:auth"
-
-let client: ReturnType<typeof createClient> | null = null
-
-async function getRedis() {
-  if (!client) {
-    client = createClient({ url: process.env.REDIS_URL })
-    client.on("error", (err) => console.error("Redis Error:", err))
-    await client.connect()
-  }
-  return client
-}
 
 function hashPassword(password: string): string {
   const salt = randomBytes(16).toString("hex")

@@ -1,19 +1,8 @@
-import { createClient } from "redis"
 import path from "path"
 import fs from "fs/promises"
+import { getRedis } from "@/lib/redis"
 
 const REDIS_KEY = "profile"
-
-let client: ReturnType<typeof createClient> | null = null
-
-async function getRedis() {
-  if (!client) {
-    client = createClient({ url: process.env.REDIS_URL })
-    client.on("error", (err) => console.error("Redis Error:", err))
-    await client.connect()
-  }
-  return client
-}
 
 async function readFile(): Promise<ProfileData | null> {
   try {

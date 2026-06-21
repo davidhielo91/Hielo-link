@@ -1,9 +1,11 @@
 import { cookies } from "next/headers"
 import { SignJWT, jwtVerify } from "jose"
 
-const secret = new TextEncoder().encode(
-  process.env.JWT_SECRET ?? "fallback-dev-secret"
-)
+const jwtSecret = process.env.JWT_SECRET
+if (!jwtSecret) {
+  throw new Error("JWT_SECRET environment variable is required")
+}
+const secret = new TextEncoder().encode(jwtSecret)
 
 export async function createSession() {
   const token = await new SignJWT({ role: "admin" })

@@ -1,6 +1,6 @@
 {
-  "name": "Tu Nombre",
-  "bio": "Creador de contenido · Desarrollador · Viajero",
+  "name": "Tu Perfil",
+  "bio": "Personaliza tu perfil desde el panel de administración",
   "avatar": null,
   "calendlyUrl": null,
   "theme": {
@@ -23,32 +23,6 @@
     "socialHoverBg": "rgba(255,255,255,0.2)",
     "socialHoverColor": "#ffffff"
   },
-  "links": [
-    {
-      "id": "link-1",
-      "title": "Mi Canal de YouTube",
-      "url": "https://youtube.com/@tucanal"
-    },
-    {
-      "id": "link-2",
-      "title": "Sígueme en Instagram",
-      "url": "https://instagram.com/tuusuario"
-    },
-    {
-      "id": "link-3",
-      "title": "Último Proyecto en GitHub",
-      "url": "https://github.com/tuusuario/proyecto"
-    },
-    {
-      "id": "link-4",
-      "title": "Escríbeme un Email",
-      "url": "mailto:hola@tudominio.com"
-    }
-  ],
-  "socials": [
-    { "platform": "youtube", "url": "https://youtube.com/@tucanal" },
-    { "platform": "instagram", "url": "https://instagram.com/tuusuario" },
-    { "platform": "twitter", "url": "https://twitter.com/tuusuario" },
-    { "platform": "github", "url": "https://github.com/tuusuario" }
-  ]
+  "links": [],
+  "socials": []
 }
