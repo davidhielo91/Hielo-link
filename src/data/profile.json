@@ -2,10 +2,15 @@
   "name": "Tu Nombre",
   "bio": "Creador de contenido · Desarrollador · Viajero",
   "avatar": null,
+  "calendlyUrl": null,
   "theme": {
     "bgFrom": "#7c3aed",
     "bgVia": "#ec4899",
     "bgTo": "#fb923c",
+    "bgImage": null,
+    "bgAnimated": false,
+    "fontHeading": "Inter",
+    "fontBody": "Inter",
     "cardBg": "rgba(255,255,255,0.1)",
     "cardBorder": "rgba(255,255,255,0.2)",
     "cardBgHover": "rgba(255,255,255,0.2)",
@@ -22,26 +27,22 @@
     {
       "id": "link-1",
       "title": "Mi Canal de YouTube",
-      "url": "https://youtube.com/@tucanal",
-      "icon": "🎬"
+      "url": "https://youtube.com/@tucanal"
     },
     {
       "id": "link-2",
       "title": "Sígueme en Instagram",
-      "url": "https://instagram.com/tuusuario",
-      "icon": "📸"
+      "url": "https://instagram.com/tuusuario"
     },
     {
       "id": "link-3",
       "title": "Último Proyecto en GitHub",
-      "url": "https://github.com/tuusuario/proyecto",
-      "icon": "💻"
+      "url": "https://github.com/tuusuario/proyecto"
     },
     {
       "id": "link-4",
       "title": "Escríbeme un Email",
-      "url": "mailto:hola@tudominio.com",
-      "icon": "✉️"
+      "url": "mailto:hola@tudominio.com"
     }
   ],
   "socials": [

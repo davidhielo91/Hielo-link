@@ -28,9 +28,25 @@ async function readFile(): Promise<ProfileData | null> {
 async function seedIfEmpty(): Promise<ProfileData> {
   const redis = await getRedis()
   const raw = await redis.get(REDIS_KEY)
-  if (raw) return JSON.parse(raw) as ProfileData
-
   const fileData = await readFile()
+
+  if (raw) {
+    const parsed = JSON.parse(raw) as ProfileData
+    if (fileData) {
+      const merged: ProfileData = {
+        ...fileData,
+        ...parsed,
+        theme: { ...fileData.theme, ...parsed.theme },
+      }
+      const mergedRaw = JSON.stringify(merged)
+      if (mergedRaw !== raw) {
+        await redis.set(REDIS_KEY, mergedRaw)
+      }
+      return merged
+    }
+    return parsed
+  }
+
   if (fileData) {
     await redis.set(REDIS_KEY, JSON.stringify(fileData))
     return fileData
@@ -43,6 +59,7 @@ export type ProfileData = {
   name: string
   bio: string
   avatar: string | null
+  calendlyUrl: string | null
   theme: Theme
   links: Link[]
   socials: Social[]
@@ -52,6 +69,10 @@ export type Theme = {
   bgFrom: string
   bgVia: string
   bgTo: string
+  bgImage: string | null
+  bgAnimated: boolean
+  fontHeading: string
+  fontBody: string
   cardBg: string
   cardBorder: string
   cardBgHover: string

@@ -1,5 +1,6 @@
 import { verifySession } from "@/lib/auth"
 import { readData, writeData } from "@/lib/storage"
+import { profileDataSchema } from "@/lib/validation"
 
 export async function GET() {
   try {
@@ -18,9 +19,10 @@ export async function PUT(req: Request) {
 
   try {
     const body = await req.json()
-    await writeData(body)
+    const parsed = profileDataSchema.parse(body)
+    await writeData(parsed)
     return Response.json({ success: true })
   } catch {
-    return Response.json({ error: "Error al guardar datos" }, { status: 500 })
+    return Response.json({ error: "Datos inválidos" }, { status: 400 })
   }
 }

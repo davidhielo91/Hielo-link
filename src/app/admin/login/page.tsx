@@ -36,14 +36,18 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-zinc-950 px-4">
+    <div className="flex min-h-dvh items-center justify-center px-4">
       <form
         onSubmit={handleSubmit}
-        className="flex w-full max-w-sm flex-col gap-6 rounded-2xl border border-zinc-800 bg-zinc-900 p-8"
+        className="flex w-full max-w-sm flex-col gap-6 rounded-2xl border p-8"
+        style={{
+          backgroundColor: "var(--card-bg)",
+          borderColor: "var(--card-border)",
+        }}
       >
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white">Admin</h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>Admin</h1>
+          <p className="mt-1 text-sm" style={{ color: "var(--text-secondary)" }}>
             Ingresa la contraseña para acceder
           </p>
         </div>
@@ -54,19 +58,30 @@ export default function LoginPage() {
           </p>
         )}
 
+        <label htmlFor="password" className="sr-only">Contraseña</label>
         <input
+          id="password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Contraseña"
-          className="w-full rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-white placeholder-zinc-500 outline-none focus:border-purple-500"
+          className="w-full rounded-xl border px-4 py-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
+          style={{
+            backgroundColor: "var(--card-bg)",
+            borderColor: "var(--card-border)",
+            color: "var(--text-primary)",
+          }}
           autoFocus
         />
 
         <button
           type="submit"
           disabled={loading || !password}
-          className="w-full rounded-xl bg-purple-600 px-4 py-3 font-medium text-white transition-colors hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-xl px-4 py-3 font-medium transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
+          style={{
+            backgroundColor: "var(--bg-from)",
+            color: "var(--text-primary)",
+          }}
         >
           {loading ? "Ingresando..." : "Entrar"}
         </button>
