@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 
-Sitemap: https://beacons-project.vercel.app/sitemap.xml
+Sitemap: https://hielo.link/sitemap.xml

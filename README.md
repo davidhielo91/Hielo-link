@@ -1,4 +1,4 @@
-# Hielink
+# Hielo.link
 
 Link-in-Bio page personalizable. Sin depender de Linktree, Beacons, ni Carrd.
 

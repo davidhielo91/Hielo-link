@@ -42,7 +42,7 @@ export default function Error({
         </button>
       </div>
       <p className="mt-8 text-xs" style={{ color: "var(--text-muted, rgba(137,180,250,0.4))" }}>
-        &copy; {new Date().getFullYear()} Hielink
+        &copy; {new Date().getFullYear()} Hielo.link
       </p>
     </div>
   )

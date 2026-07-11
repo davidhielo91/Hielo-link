@@ -30,19 +30,19 @@ export async function generateMetadata(): Promise<Metadata> {
     // Redis unavailable — use fallback metadata
   }
 
-  const title = name || "Hielink"
+  const title = name || "Hielo.link"
   const description = bio || "Link in Bio personalizable"
   const image = avatar ?? undefined
 
   return {
-    metadataBase: new URL("https://beacons-project.vercel.app"),
+    metadataBase: new URL("https://hielo.link"),
     title,
     description,
     openGraph: {
       title,
       description,
-      url: "https://beacons-project.vercel.app",
-      siteName: "Hielink",
+      url: "https://hielo.link",
+      siteName: "Hielo.link",
       ...(image && { images: [{ url: image, width: 96, height: 96, alt: title }] }),
     },
     twitter: {

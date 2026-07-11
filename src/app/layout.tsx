@@ -22,7 +22,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
       <head>
-        <link rel="canonical" href="https://beacons-project.vercel.app" />
+        <link rel="canonical" href="https://hielo.link" />
       </head>
       <body className="min-h-dvh font-sans">{children}</body>
     </html>
