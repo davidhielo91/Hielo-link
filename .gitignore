@@ -46,6 +46,8 @@ skills/
 # ai / tooling
 .atl/
 opencode.json
+AGENTS.md
+CLAUDE.md
 
 # typescript
 *.tsbuildinfo

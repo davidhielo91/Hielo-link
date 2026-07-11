@@ -54,4 +54,10 @@ El admin está en `/admin`. La primera vez se crean datos de ejemplo desde `src/
 
 ## Deploy en Vercel
 
-Conecta el repo y agrega las 3 variables de entorno en el dashboard.
+Conecta el repo a Vercel y agrega estas 3 variables de entorno en el dashboard:
+
+- `REDIS_URL` — conexión a Redis (Upstash o local)
+- `ADMIN_PASSWORD` — contraseña para el panel de admin
+- `JWT_SECRET` — secreto para firmar sesiones
+
+El proyecto tiene CI/CD integrado: en cada push a `main` corre lint, typecheck y build automáticamente.
