@@ -1,6 +1,7 @@
 import path from "path"
 import fs from "fs/promises"
 import { getRedis } from "@/lib/redis"
+import type { ProfileData } from "@/lib/validation"
 
 const REDIS_KEY = "profile"
 
@@ -42,49 +43,6 @@ async function seedIfEmpty(): Promise<ProfileData> {
   }
 
   throw new Error("No data found in Redis or file")
-}
-
-export type ProfileData = {
-  name: string
-  bio: string
-  avatar: string | null
-  calendlyUrl: string | null
-  theme: Theme
-  links: Link[]
-  socials: Social[]
-}
-
-export type Theme = {
-  bgFrom: string
-  bgVia: string
-  bgTo: string
-  bgImage: string | null
-  bgAnimated: boolean
-  fontHeading: string
-  fontBody: string
-  cardBg: string
-  cardBorder: string
-  cardBgHover: string
-  textPrimary: string
-  textSecondary: string
-  textMuted: string
-  ringColor: string
-  socialBg: string
-  socialColor: string
-  socialHoverBg: string
-  socialHoverColor: string
-}
-
-export type Link = {
-  id: string
-  title: string
-  url: string
-  icon?: string
-}
-
-export type Social = {
-  platform: string
-  url: string
 }
 
 export async function readData(): Promise<ProfileData> {

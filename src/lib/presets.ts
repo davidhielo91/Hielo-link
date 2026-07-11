@@ -1,4 +1,4 @@
-import type { Theme } from "./storage"
+import type { Theme } from "./validation"
 
 export type Preset = {
   name: string
