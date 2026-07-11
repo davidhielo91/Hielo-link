@@ -1,6 +1,7 @@
 import { verifySession } from "@/lib/auth"
 import { readData, writeData } from "@/lib/storage"
 import { profileDataSchema } from "@/lib/validation"
+import { revalidateTag } from "next/cache"
 
 export async function GET() {
   try {
@@ -19,10 +20,20 @@ export async function PUT(req: Request) {
 
   try {
     const body = await req.json()
-    const parsed = profileDataSchema.parse(body)
-    await writeData(parsed)
+    const result = profileDataSchema.safeParse(body)
+
+    if (!result.success) {
+      const errors = result.error.issues.map((issue) => ({
+        field: issue.path.join("."),
+        message: issue.message,
+      }))
+      return Response.json({ errors }, { status: 400 })
+    }
+
+    await writeData(result.data)
+    revalidateTag("profile", "max")
     return Response.json({ success: true })
   } catch {
-    return Response.json({ error: "Datos inválidos" }, { status: 400 })
+    return Response.json({ error: "Error al procesar la solicitud" }, { status: 500 })
   }
 }

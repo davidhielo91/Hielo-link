@@ -1,18 +1,19 @@
-const attempts = new Map<string, { count: number; resetAt: number }>()
+import { getRedis } from "@/lib/redis"
 
-export function checkRateLimit(key: string, maxAttempts = 5, windowMs = 60000): boolean {
-  const now = Date.now()
-  const entry = attempts.get(key)
+export async function checkRateLimit(key: string, maxAttempts = 5, windowMs = 60000): Promise<boolean> {
+  try {
+    const redis = await getRedis()
+    const redisKey = `ratelimit:${key}`
+    const windowSeconds = Math.ceil(windowMs / 1000)
 
-  if (!entry || now > entry.resetAt) {
-    attempts.set(key, { count: 1, resetAt: now + windowMs })
+    const count = await redis.incr(redisKey)
+    if (count === 1) {
+      await redis.expire(redisKey, windowSeconds)
+    }
+
+    return count <= maxAttempts
+  } catch (error) {
+    console.error("Rate limit error:", error)
     return true
   }
-
-  if (entry.count >= maxAttempts) {
-    return false
-  }
-
-  entry.count++
-  return true
 }

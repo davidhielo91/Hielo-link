@@ -1,15 +1,65 @@
 import type { CSSProperties } from "react"
+import type { Metadata } from "next"
 import Profile from "@/components/Profile"
 import LinkCard from "@/components/LinkCard"
 import CalendarCard from "@/components/CalendarCard"
 import SocialIcons from "@/components/SocialIcons"
+import CopyrightYear from "@/components/CopyrightYear"
 import { readData } from "@/lib/storage"
 import { getFontInfo } from "@/lib/fonts"
+import { cacheLife, cacheTag } from "next/cache"
 
-export const dynamic = "force-dynamic"
+async function getProfile() {
+  "use cache"
+  cacheLife("minutes")
+  cacheTag("profile")
+  return readData()
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  let name: string | null = null
+  let bio: string | null = null
+  let avatar: string | null = null
+
+  try {
+    const data = await getProfile()
+    name = data.name
+    bio = data.bio
+    avatar = data.avatar
+  } catch {
+    // Redis unavailable — use fallback metadata
+  }
+
+  const title = name || "Hielink"
+  const description = bio || "Link in Bio personalizable"
+  const image = avatar ?? undefined
+
+  return {
+    metadataBase: new URL("https://beacons-project.vercel.app"),
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: "https://beacons-project.vercel.app",
+      siteName: "Hielink",
+      ...(image && { images: [{ url: image, width: 96, height: 96, alt: title }] }),
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+      ...(image && { images: [image] }),
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  }
+}
 
 export default async function Home() {
-  const { name, bio, avatar, calendlyUrl, theme, links, socials } = await readData()
+  const { name, bio, avatar, calendlyUrl, theme, links, socials } = await getProfile()
 
   const themeVars: CSSProperties & Record<string, string> = {
     "--bg-from": theme.bgFrom,
@@ -54,8 +104,23 @@ export default async function Home() {
   if (headingFont) fontLinks.add(headingFont.url)
   if (bodyFont) fontLinks.add(bodyFont.url)
 
+  const personJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: name || undefined,
+    ...(socials.length > 0 && {
+      sameAs: socials.map((s) => s.url),
+    }),
+  }
+
   return (
     <>
+      {name && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        />
+      )}
       {[...fontLinks].map((url) => (
         <link key={url} rel="stylesheet" href={url} />
       ))}
@@ -86,7 +151,7 @@ export default async function Home() {
             className="text-center text-sm"
             style={{ color: "var(--text-muted)" }}
           >
-            &copy; {new Date().getFullYear()} {name}
+            <CopyrightYear name={name} />
           </p>
         </div>
       </div>

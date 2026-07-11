@@ -5,7 +5,7 @@ import { verifyAdminPassword, getAdminPasswordHash } from "@/lib/admin-auth"
 export async function POST(req: Request) {
   try {
     const ip = req.headers.get("x-forwarded-for") ?? "unknown"
-    if (!checkRateLimit(`login:${ip}`)) {
+    if (!(await checkRateLimit(`login:${ip}`))) {
       return Response.json({ error: "Demasiados intentos. Intenta de nuevo en 1 minuto" }, { status: 429 })
     }
 

@@ -1,6 +1,14 @@
 import type { CSSProperties } from "react"
 import { readData } from "@/lib/storage"
 import { getFontInfo } from "@/lib/fonts"
+import { cacheLife, cacheTag } from "next/cache"
+
+async function getThemeData() {
+  "use cache"
+  cacheLife("minutes")
+  cacheTag("profile")
+  return readData()
+}
 
 export default async function AdminLayout({
   children,
@@ -16,7 +24,7 @@ export default async function AdminLayout({
   let isAnimated = false
 
   try {
-    const data = await readData()
+    const data = await getThemeData()
     const t = data.theme
 
     const hf = getFontInfo(t.fontHeading)

@@ -1,4 +1,3 @@
-import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 
@@ -12,11 +11,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 })
 
-export const metadata: Metadata = {
-  title: "Mi Link in Bio",
-  description: "Todas mis redes y enlaces importantes en un solo lugar",
-}
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,6 +21,9 @@ export default function RootLayout({
       lang="es"
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
+      <head>
+        <link rel="canonical" href="https://beacons-project.vercel.app" />
+      </head>
       <body className="min-h-dvh font-sans">{children}</body>
     </html>
   )
