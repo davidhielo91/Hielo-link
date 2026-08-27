@@ -29,18 +29,18 @@ export default function SortableLinkItem({
         isEditing ? "border-purple-500 bg-purple-500/10" : "border-zinc-800 bg-zinc-900"
       } ${isDragging ? "z-10 shadow-xl" : ""}`}
     >
-      <button {...attributes} {...listeners} className="shrink-0 cursor-grab active:cursor-grabbing">
+      <button {...attributes} {...listeners} aria-label={`Reordenar ${link.title}`} className="shrink-0 cursor-grab active:cursor-grabbing">
         <GripVertical className="size-4 text-zinc-600" />
       </button>
       <span className="flex-1 truncate">{link.title}</span>
       <span className="hidden truncate text-sm text-zinc-500 sm:block">{link.url}</span>
-      <button onClick={() => onEdit(link.id)} className="shrink-0 p-1 text-zinc-500 hover:text-purple-400">
+      <button onClick={() => onEdit(link.id)} aria-label={`Editar ${link.title}`} className="shrink-0 p-1 text-zinc-500 hover:text-purple-400">
         <Pencil className="size-4" />
       </button>
-      <a href={link.url} target="_blank" rel="noopener noreferrer" className="shrink-0 p-1 text-zinc-500 hover:text-white">
+      <a href={link.url} target="_blank" rel="noopener noreferrer" aria-label={`Abrir ${link.title} en una pestaña nueva`} className="shrink-0 p-1 text-zinc-500 hover:text-white">
         <ExternalLink className="size-4" />
       </a>
-      <button onClick={() => onDelete(link.id)} className="shrink-0 p-1 text-zinc-500 hover:text-red-400">
+      <button onClick={() => onDelete(link.id)} aria-label={`Eliminar ${link.title}`} className="shrink-0 p-1 text-zinc-500 hover:text-red-400">
         <Trash2 className="size-4" />
       </button>
     </div>

@@ -1,16 +1,23 @@
 export default function Field({
-  label, value, onChange, placeholder,
+  id, label, name, value, onChange, placeholder, type = "text", autoComplete = "off",
 }: {
+  id: string
   label: string
+  name: string
   value: string
   onChange: (v: string) => void
   placeholder?: string
+  type?: "text" | "url"
+  autoComplete?: string
 }) {
   return (
     <div className="mb-3">
-      <label className="mb-1 block text-sm text-zinc-400">{label}</label>
+      <label htmlFor={id} className="mb-1 block text-sm text-zinc-400">{label}</label>
       <input
-        type="text"
+        id={id}
+        name={name}
+        type={type}
+        autoComplete={autoComplete}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
