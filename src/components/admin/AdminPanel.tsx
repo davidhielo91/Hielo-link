@@ -93,10 +93,10 @@ export default function AdminPanel() {
     setPwMessage(null)
     if (!pwCurrent || !pwNew || !pwConfirm) return setPwMessage({ type: "error", text: "Completa todos los campos" })
     if (pwNew !== pwConfirm) return setPwMessage({ type: "error", text: "Las contraseñas nuevas no coinciden" })
-    if (pwNew.length < 6) return setPwMessage({ type: "error", text: "Mínimo 6 caracteres" })
+    if (pwNew.length < 12) return setPwMessage({ type: "error", text: "La nueva contraseña debe tener al menos 12 caracteres" })
     setPwSaving(true)
     try {
-      const res = await fetch("/api/auth/change-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ currentPassword: pwCurrent, newPassword: pwNew }) })
+      const res = await fetch("/api/auth/change-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ currentPassword: pwCurrent, newPassword: pwNew, confirmPassword: pwConfirm }) })
       if (!res.ok) {
         const response = await res.json()
         setPwMessage({ type: "error", text: response.error || "Error al cambiar" })

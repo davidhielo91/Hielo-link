@@ -8,14 +8,22 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { currentPassword, newPassword } = await req.json()
+    const { currentPassword, newPassword, confirmPassword } = await req.json()
 
-    if (!currentPassword || !newPassword) {
-      return Response.json({ error: "Ambas contraseñas son requeridas" }, { status: 400 })
+    if (typeof currentPassword !== "string" || typeof newPassword !== "string" || typeof confirmPassword !== "string") {
+      return Response.json({ error: "Completa todos los campos de contraseña" }, { status: 400 })
     }
 
-    if (newPassword.length < 6) {
-      return Response.json({ error: "La nueva contraseña debe tener al menos 6 caracteres" }, { status: 400 })
+    if (newPassword.length === 0) {
+      return Response.json({ error: "La nueva contraseña no puede estar vacía" }, { status: 400 })
+    }
+
+    if (newPassword.length < 12) {
+      return Response.json({ error: "La nueva contraseña debe tener al menos 12 caracteres" }, { status: 400 })
+    }
+
+    if (newPassword !== confirmPassword) {
+      return Response.json({ error: "Las contraseñas nuevas no coinciden" }, { status: 400 })
     }
 
     const valid = await verifyAdminPassword(currentPassword)
