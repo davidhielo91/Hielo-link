@@ -1,10 +1,13 @@
 import { z } from "zod"
 
+const webUrlSchema = z.url({ protocol: /^https?$/ })
+const httpsUrlSchema = z.url({ protocol: /^https$/ })
+
 const themeSchema = z.object({
   bgFrom: z.string(),
   bgVia: z.string(),
   bgTo: z.string(),
-  bgImage: z.string().url("URL inválida").nullable(),
+  bgImage: httpsUrlSchema.nullable(),
   bgAnimated: z.boolean(),
   fontHeading: z.string(),
   fontBody: z.string(),
@@ -24,20 +27,20 @@ const themeSchema = z.object({
 const linkSchema = z.object({
   id: z.string(),
   title: z.string(),
-  url: z.string().url("URL inválida"),
+  url: webUrlSchema,
   icon: z.string().optional(),
 })
 
 const socialSchema = z.object({
   platform: z.string(),
-  url: z.string().url("URL inválida"),
+  url: webUrlSchema,
 })
 
 export const profileDataSchema = z.object({
   name: z.string(),
   bio: z.string(),
   avatar: z.string().nullable(),
-  calendlyUrl: z.string().url("URL inválida").nullable(),
+  calendlyUrl: webUrlSchema.nullable(),
   theme: themeSchema,
   links: z.array(linkSchema),
   socials: z.array(socialSchema),
