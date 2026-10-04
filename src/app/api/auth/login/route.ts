@@ -1,11 +1,14 @@
 import { createSession } from "@/lib/auth"
-import { checkRateLimit } from "@/lib/rate-limit"
+import { checkRateLimit, getLoginRateLimitKey } from "@/lib/rate-limit"
 import { verifyAdminPassword, getAdminPasswordHash } from "@/lib/admin-auth"
 
 export async function POST(req: Request) {
   try {
-    const ip = req.headers.get("x-forwarded-for") ?? "unknown"
-    if (!(await checkRateLimit(`login:${ip}`))) {
+    const rateLimitResult = await checkRateLimit(getLoginRateLimitKey(req))
+    if (rateLimitResult === "unavailable") {
+      return Response.json({ error: "Login is temporarily unavailable" }, { status: 503 })
+    }
+    if (rateLimitResult === "limited") {
       return Response.json({ error: "Demasiados intentos. Intenta de nuevo en 1 minuto" }, { status: 429 })
     }
 

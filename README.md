@@ -28,6 +28,7 @@ Link-in-Bio page personalizable. Sin depender de Linktree, Beacons, ni Carrd.
 ADMIN_PASSWORD=tu-contraseña
 JWT_SECRET=tu-secreto-jwt
 REDIS_URL=redis://default:password@host:port
+TRUST_X_FORWARDED_FOR_FOR_RATE_LIMITING=false
 ```
 
 Ver `.env.example`.
@@ -54,10 +55,11 @@ El admin está en `/admin`. La primera vez se crean datos de ejemplo desde `src/
 
 ## Deploy en Vercel
 
-Conecta el repo a Vercel y agrega estas 3 variables de entorno en el dashboard:
+Conecta el repo a Vercel y agrega estas 4 variables de entorno en el dashboard:
 
 - `REDIS_URL` — conexión a Redis (Upstash o local)
 - `ADMIN_PASSWORD` — contraseña para el panel de admin
 - `JWT_SECRET` — secreto para firmar sesiones
+- `TRUST_X_FORWARDED_FOR_FOR_RATE_LIMITING` — leave `false` unless the deployment's trusted proxy replaces client-supplied `X-Forwarded-For`. When false, login requests share one conservative rate-limit bucket. When true, only the first valid IP address is used and mapped to one of 1,024 bounded buckets.
 
 El proyecto tiene CI/CD integrado: en cada push a `main` corre lint, typecheck y build automáticamente.

@@ -1,18 +1,68 @@
 import path from "path"
 import fs from "fs/promises"
 import { getRedis } from "@/lib/redis"
-import type { ProfileData } from "@/lib/validation"
+import { profileDataSchema, type ProfileData } from "@/lib/validation"
 
 const REDIS_KEY = "profile"
 
-async function readFile(): Promise<ProfileData | null> {
+class ProfileDataStorageError extends Error {
+  constructor(source: "Redis" | "seed file", reason: string) {
+    super(`Invalid profile data in ${source}: ${reason}`)
+  }
+}
+
+function parseJson(raw: string, source: "Redis" | "seed file"): unknown {
   try {
-    const DATA_FILE = path.join(process.cwd(), "src", "data", "profile.json")
-    const raw = await fs.readFile(DATA_FILE, "utf-8")
     return JSON.parse(raw)
   } catch {
-    return null
+    throw new ProfileDataStorageError(source, "invalid JSON")
   }
+}
+
+function validateProfileData(data: unknown, source: "Redis" | "seed file"): ProfileData {
+  const result = profileDataSchema.safeParse(data)
+  if (result.success) return result.data
+
+  const fields = result.error.issues
+    .map((issue) => issue.path.join(".") || "root")
+    .join(", ")
+  throw new ProfileDataStorageError(source, `invalid fields: ${fields}`)
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+}
+
+async function readFile(): Promise<ProfileData | null> {
+  const DATA_FILE = path.join(process.cwd(), "src", "data", "profile.json")
+  let raw: string
+
+  try {
+    raw = await fs.readFile(DATA_FILE, "utf-8")
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null
+    throw new ProfileDataStorageError("seed file", "could not be read")
+  }
+
+  return validateProfileData(parseJson(raw, "seed file"), "seed file")
+}
+
+function normalizeRedisData(raw: string, seedData: ProfileData): ProfileData {
+  const storedData = parseJson(raw, "Redis")
+  if (!isRecord(storedData)) {
+    throw new ProfileDataStorageError("Redis", "expected an object")
+  }
+
+  const { theme, ...profile } = storedData
+  if (theme !== undefined && !isRecord(theme)) {
+    throw new ProfileDataStorageError("Redis", "invalid fields: theme")
+  }
+
+  return validateProfileData({
+    ...seedData,
+    ...profile,
+    theme: { ...seedData.theme, ...theme },
+  }, "Redis")
 }
 
 async function seedIfEmpty(): Promise<ProfileData> {
@@ -21,20 +71,15 @@ async function seedIfEmpty(): Promise<ProfileData> {
   const fileData = await readFile()
 
   if (raw) {
-    const parsed = JSON.parse(raw) as ProfileData
     if (fileData) {
-      const merged: ProfileData = {
-        ...fileData,
-        ...parsed,
-        theme: { ...fileData.theme, ...parsed.theme },
-      }
+      const merged = normalizeRedisData(raw, fileData)
       const mergedRaw = JSON.stringify(merged)
       if (mergedRaw !== raw) {
         await redis.set(REDIS_KEY, mergedRaw)
       }
       return merged
     }
-    return parsed
+    return validateProfileData(parseJson(raw, "Redis"), "Redis")
   }
 
   if (fileData) {
@@ -46,7 +91,14 @@ async function seedIfEmpty(): Promise<ProfileData> {
 }
 
 export async function readData(): Promise<ProfileData> {
-  return seedIfEmpty()
+  try {
+    return await seedIfEmpty()
+  } catch (error) {
+    if (error instanceof ProfileDataStorageError) {
+      console.error("Profile data storage validation failed", { message: error.message })
+    }
+    throw error
+  }
 }
 
 export async function writeData(data: ProfileData): Promise<void> {

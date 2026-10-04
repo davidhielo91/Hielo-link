@@ -69,7 +69,7 @@ export default function AvatarUpload({ value, onChange }: Props) {
 
   return (
     <div>
-      <label className="mb-1 block text-sm text-zinc-400">Avatar</label>
+      <label htmlFor="avatar-upload" className="mb-1 block text-sm text-zinc-400">Avatar</label>
       <div className="flex items-center gap-4">
         <div className="relative size-20 shrink-0 overflow-hidden rounded-full border border-zinc-700 bg-zinc-800">
           {value ? (
@@ -103,9 +103,11 @@ export default function AvatarUpload({ value, onChange }: Props) {
           <p className="text-xs text-zinc-500">JPEG o PNG · máx 512×512px</p>
         </div>
       </div>
-      {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
+      {error && <p aria-live="polite" className="mt-2 text-xs text-red-400">{error}</p>}
       <input
+        id="avatar-upload"
         ref={inputRef}
+        name="avatar"
         type="file"
         accept="image/jpeg,image/png"
         className="hidden"
