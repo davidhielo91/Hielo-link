@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 
 vi.mock("@/lib/auth", () => ({ verifySession: vi.fn() }))
 vi.mock("@/lib/storage", () => ({ readData: vi.fn(), writeData: vi.fn() }))
-vi.mock("@/lib/admin-auth", () => ({ verifyAdminPassword: vi.fn(), setAdminPassword: vi.fn() }))
+vi.mock("@/lib/admin-auth", () => ({ verifyAdminPassword: vi.fn(), setAdminPassword: vi.fn(), getAdminPasswordHash: vi.fn(async () => "hash"), matchesEnvPassword: vi.fn() }))
 vi.mock("next/cache", () => ({ revalidateTag: vi.fn() }))
 
 import { verifySession } from "@/lib/auth"

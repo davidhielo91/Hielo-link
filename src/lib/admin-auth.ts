@@ -1,4 +1,4 @@
-import { randomBytes, scrypt, timingSafeEqual } from "crypto"
+import { createHash, randomBytes, scrypt, timingSafeEqual } from "crypto"
 import { getRedis } from "@/lib/redis"
 
 const REDIS_KEY = "admin:auth"
@@ -33,13 +33,23 @@ async function verifyPassword(password: string, stored: string): Promise<boolean
   return timingSafeEqual(derived, storedHash)
 }
 
+/**
+ * Returns the stored hash, or null when none exists.
+ * Redis errors are NOT swallowed: callers must not treat "unavailable"
+ * as "no custom password" (that would re-enable the ADMIN_PASSWORD fallback).
+ */
 export async function getAdminPasswordHash(): Promise<string | null> {
-  try {
-    const redis = await getRedis()
-    return await redis.get(REDIS_KEY)
-  } catch {
-    return null
-  }
+  const redis = await getRedis()
+  return redis.get(REDIS_KEY)
+}
+
+/** Constant-time comparison against the ADMIN_PASSWORD environment fallback. */
+export function matchesEnvPassword(password: string): boolean {
+  const expected = process.env.ADMIN_PASSWORD
+  if (!expected) return false
+  const a = createHash("sha256").update(password).digest()
+  const b = createHash("sha256").update(expected).digest()
+  return timingSafeEqual(a, b)
 }
 
 export async function setAdminPassword(password: string): Promise<void> {

@@ -71,19 +71,16 @@ async function seedIfEmpty(): Promise<ProfileData> {
   const fileData = await readFile()
 
   if (raw) {
-    if (fileData) {
-      const merged = normalizeRedisData(raw, fileData)
-      const mergedRaw = JSON.stringify(merged)
-      if (mergedRaw !== raw) {
-        await redis.set(REDIS_KEY, mergedRaw)
-      }
-      return merged
-    }
+    // Reads never rewrite existing data: persisting the merge here could
+    // overwrite a concurrent admin save. The merge is applied on every read
+    // and persisted naturally on the next writeData.
+    if (fileData) return normalizeRedisData(raw, fileData)
     return validateProfileData(parseJson(raw, "Redis"), "Redis")
   }
 
   if (fileData) {
-    await redis.set(REDIS_KEY, JSON.stringify(fileData))
+    // NX: only seed if nobody wrote the key in the meantime.
+    await redis.set(REDIS_KEY, JSON.stringify(fileData), { NX: true })
     return fileData
   }
 

@@ -1,6 +1,6 @@
 import { createSession } from "@/lib/auth"
 import { checkRateLimit, getLoginRateLimitKey } from "@/lib/rate-limit"
-import { verifyAdminPassword, getAdminPasswordHash } from "@/lib/admin-auth"
+import { verifyAdminPassword, getAdminPasswordHash, matchesEnvPassword } from "@/lib/admin-auth"
 
 export async function POST(req: Request) {
   try {
@@ -13,14 +13,20 @@ export async function POST(req: Request) {
     }
 
     const { password } = await req.json()
-    if (!password) {
+    if (typeof password !== "string" || !password) {
       return Response.json({ error: "Contraseña requerida" }, { status: 400 })
     }
 
-    const hasCustomAuth = await getAdminPasswordHash()
-    const valid = hasCustomAuth
+    let storedHash: string | null
+    try {
+      storedHash = await getAdminPasswordHash()
+    } catch {
+      return Response.json({ error: "Login is temporarily unavailable" }, { status: 503 })
+    }
+
+    const valid = storedHash
       ? await verifyAdminPassword(password)
-      : password === process.env.ADMIN_PASSWORD
+      : matchesEnvPassword(password)
 
     if (!valid) {
       return Response.json({ error: "Contraseña incorrecta" }, { status: 401 })

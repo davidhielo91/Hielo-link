@@ -28,6 +28,8 @@ const defaultData: ProfileData = {
 export default function AdminPanel() {
   const [data, setData] = useState<ProfileData>(defaultData)
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
+  const [reloadKey, setReloadKey] = useState(0)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<AdminMessage | null>(null)
   const [newLink, setNewLink] = useState<LinkForm>({ title: "", url: "" })
@@ -49,15 +51,23 @@ export default function AdminPanel() {
         const res = await fetch("/api/data")
         if (!res.ok) throw new Error()
         const json = await res.json()
-        if (!cancelled) setData(json)
+        if (!cancelled) {
+          setData(json)
+          setLoadError(false)
+        }
       } catch {
-        if (!cancelled) setMessage({ type: "error", text: "Error al cargar datos" })
+        if (!cancelled) setLoadError(true)
       } finally {
         if (!cancelled) setLoading(false)
       }
     })()
     return () => { cancelled = true }
-  }, [])
+  }, [reloadKey])
+
+  function retryLoad() {
+    setLoading(true)
+    setReloadKey((key) => key + 1)
+  }
 
   async function save() {
     setSaving(true)
@@ -172,6 +182,14 @@ export default function AdminPanel() {
   }
 
   if (loading) return <div className="flex min-h-dvh items-center justify-center"><div className="size-8 animate-spin rounded-full border-2 border-zinc-500 border-t-purple-400" /></div>
+
+  // Never render the editor with placeholder data: saving it would overwrite the real profile.
+  if (loadError) return (
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-4 px-4" style={{ color: "var(--text-primary)" }} role="alert">
+      <p>No se pudieron cargar los datos. Para evitar sobrescribirlos, el editor está bloqueado.</p>
+      <button type="button" onClick={retryLoad} className="rounded-xl bg-purple-600 px-6 py-2 font-medium transition-colors hover:bg-purple-500">Reintentar</button>
+    </div>
+  )
 
   return (
     <div className="min-h-dvh px-4 py-8" style={{ color: "var(--text-primary)" }}>
