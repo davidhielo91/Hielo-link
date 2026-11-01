@@ -24,10 +24,13 @@ export async function createSession() {
 }
 
 export async function verifySession(): Promise<boolean> {
+  // cookies() must stay outside the try/catch: during prerendering it throws a
+  // control-flow signal that Next uses to defer the page to request time.
+  // Swallowing it makes the page "change from static to dynamic" at runtime.
+  const cookieStore = await cookies()
+  const token = cookieStore.get("session")?.value
+  if (!token) return false
   try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("session")?.value
-    if (!token) return false
     await jwtVerify(token, secret)
     return true
   } catch {
