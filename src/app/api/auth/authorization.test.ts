@@ -2,11 +2,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 
 vi.mock("@/lib/auth", () => ({ verifySession: vi.fn() }))
 vi.mock("@/lib/storage", () => ({ readData: vi.fn(), writeData: vi.fn() }))
-vi.mock("@/lib/admin-auth", () => ({ verifyAdminPassword: vi.fn(), setAdminPassword: vi.fn() }))
+vi.mock("@/lib/admin-auth", () => ({ authenticateAdmin: vi.fn(), setAdminPassword: vi.fn() }))
 vi.mock("next/cache", () => ({ revalidateTag: vi.fn() }))
 
 import { verifySession } from "@/lib/auth"
-import { setAdminPassword, verifyAdminPassword } from "@/lib/admin-auth"
+import { authenticateAdmin, setAdminPassword } from "@/lib/admin-auth"
 import { PUT } from "@/app/api/data/route"
 import { POST as changePassword } from "@/app/api/auth/change-password/route"
 import { GET as getSession } from "@/app/api/auth/me/route"
@@ -26,7 +26,7 @@ describe("administrative API authorization", () => {
 
   it("enforces a confirmed 12-character password before persisting", async () => {
     vi.mocked(verifySession).mockResolvedValue(true)
-    vi.mocked(verifyAdminPassword).mockResolvedValue(true)
+    vi.mocked(authenticateAdmin).mockResolvedValue("ok")
     const tooShort = await changePassword(new Request("https://example.com/api/auth/change-password", { method: "POST", body: JSON.stringify({ currentPassword: "current", newPassword: "short", confirmPassword: "short" }) }))
     expect(tooShort.status).toBe(400)
 
