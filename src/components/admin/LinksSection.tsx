@@ -1,4 +1,5 @@
-import { Plus } from "lucide-react"
+import { Ban, Plus } from "lucide-react"
+import { linkIcons } from "@/lib/link-icons"
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core"
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import Section from "@/components/admin/Section"
@@ -42,6 +43,34 @@ export default function LinksSection({ links, form, showForm, editingLink, onDra
           <input id="link-title" name="linkTitle" type="text" autoComplete="off" placeholder="Título" value={form.title} onChange={(e) => onFormChange({ ...form, title: e.target.value })} className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus:border-purple-500" />
           <label htmlFor="link-url" className="sr-only">URL del enlace</label>
           <input id="link-url" name="linkUrl" type="url" autoComplete="url" placeholder="URL" value={form.url} onChange={(e) => onFormChange({ ...form, url: e.target.value })} className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus:border-purple-500" />
+          <fieldset className="min-w-0">
+            <legend className="mb-1 text-xs text-zinc-500">Icono (opcional)</legend>
+            <div className="grid max-h-40 grid-cols-6 gap-1 overflow-y-auto rounded-lg border border-zinc-700 bg-zinc-800 p-2 sm:grid-cols-8">
+              <button
+                type="button"
+                aria-pressed={form.icon === ""}
+                aria-label="Sin icono"
+                title="Sin icono"
+                onClick={() => onFormChange({ ...form, icon: "" })}
+                className={`flex size-9 items-center justify-center rounded-md border text-xs outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 ${form.icon === "" ? "border-purple-500 bg-purple-500/20 text-white" : "border-transparent text-zinc-500 hover:bg-zinc-700 hover:text-white"}`}
+              >
+                <Ban className="size-4" aria-hidden="true" />
+              </button>
+              {linkIcons.map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  type="button"
+                  aria-pressed={form.icon === id}
+                  aria-label={label}
+                  title={label}
+                  onClick={() => onFormChange({ ...form, icon: id })}
+                  className={`flex size-9 items-center justify-center rounded-md border outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 ${form.icon === id ? "border-purple-500 bg-purple-500/20 text-white" : "border-transparent text-zinc-400 hover:bg-zinc-700 hover:text-white"}`}
+                >
+                  <Icon className="size-4" aria-hidden="true" />
+                </button>
+              ))}
+            </div>
+          </fieldset>
           <div className="flex gap-2">
             <button onClick={onAdd} className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium transition-colors hover:bg-purple-500">{editingLink ? "Actualizar" : "Agregar"}</button>
             <button onClick={onCancel} className="rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-400 transition-colors hover:text-white">Cancelar</button>

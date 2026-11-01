@@ -28,7 +28,7 @@ const linkSchema = z.object({
   id: z.string(),
   title: z.string(),
   url: webUrlSchema,
-  icon: z.string().optional(),
+  icon: z.string().max(40).optional(),
 })
 
 const socialSchema = z.object({
