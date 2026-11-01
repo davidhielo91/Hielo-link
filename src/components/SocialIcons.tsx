@@ -1,7 +1,7 @@
 "use client"
 
 import { getIcon } from "@/lib/socials"
-import { FaGlobe } from "react-icons/fa"
+import { FaGlobe } from "react-icons/fa6"
 
 type Social = {
   platform: string
