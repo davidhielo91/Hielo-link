@@ -4,16 +4,18 @@ import { type CSSProperties } from "react"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { GripVertical, Pencil, ExternalLink, Trash2 } from "lucide-react"
+import { getLinkIcon } from "@/lib/link-icons"
 
 export default function SortableLinkItem({
   link, isEditing, onEdit, onDelete,
 }: {
-  link: { id: string; title: string; url: string }
+  link: { id: string; title: string; url: string; icon?: string }
   isEditing: boolean
   onEdit: (id: string) => void
   onDelete: (id: string) => void
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: link.id })
+  const LinkIcon = getLinkIcon(link.icon)?.icon
 
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -32,6 +34,7 @@ export default function SortableLinkItem({
       <button {...attributes} {...listeners} aria-label={`Reordenar ${link.title}`} className="shrink-0 cursor-grab active:cursor-grabbing">
         <GripVertical className="size-4 text-zinc-600" />
       </button>
+      {LinkIcon && <LinkIcon aria-hidden="true" className="size-4 shrink-0 text-zinc-400" />}
       <span className="flex-1 truncate">{link.title}</span>
       <span className="hidden truncate text-sm text-zinc-500 sm:block">{link.url}</span>
       <button onClick={() => onEdit(link.id)} aria-label={`Editar ${link.title}`} className="shrink-0 p-1 text-zinc-500 hover:text-purple-400">

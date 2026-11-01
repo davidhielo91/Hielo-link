@@ -32,7 +32,7 @@ export default function AdminPanel() {
   const [reloadKey, setReloadKey] = useState(0)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<AdminMessage | null>(null)
-  const [newLink, setNewLink] = useState<LinkForm>({ title: "", url: "" })
+  const [newLink, setNewLink] = useState<LinkForm>({ title: "", url: "", icon: "" })
   const [newSocial, setNewSocial] = useState<SocialForm>({ platform: "", url: "" })
   const [showLinkForm, setShowLinkForm] = useState(false)
   const [editingLink, setEditingLink] = useState<string | null>(null)
@@ -129,7 +129,7 @@ export default function AdminPanel() {
   }
 
   function cancelLinkForm() {
-    setNewLink({ title: "", url: "" })
+    setNewLink({ title: "", url: "", icon: "" })
     setShowLinkForm(false)
     setEditingLink(null)
   }
@@ -138,13 +138,14 @@ export default function AdminPanel() {
     const link = data.links.find((item) => item.id === id)
     if (!link) return
     setEditingLink(id)
-    setNewLink({ title: link.title, url: link.url })
+    setNewLink({ title: link.title, url: link.url, icon: link.icon ?? "" })
     setShowLinkForm(true)
   }
 
   function addLink() {
     if (!newLink.title || !newLink.url) return
-    setData((prev) => ({ ...prev, links: editingLink ? prev.links.map((link) => link.id === editingLink ? { ...link, ...newLink } : link) : [...prev.links, { id: `link-${Date.now()}`, ...newLink }] }))
+    const fields = { title: newLink.title, url: newLink.url, icon: newLink.icon || undefined }
+    setData((prev) => ({ ...prev, links: editingLink ? prev.links.map((link) => link.id === editingLink ? { ...link, ...fields } : link) : [...prev.links, { id: `link-${Date.now()}`, ...fields }] }))
     cancelLinkForm()
   }
 

@@ -139,7 +139,7 @@ export default async function Home() {
 
           <div className="flex w-full flex-col gap-3">
             {links.map((link) => (
-              <LinkCard key={link.id} title={link.title} url={link.url} />
+              <LinkCard key={link.id} title={link.title} url={link.url} icon={link.icon} />
             ))}
           </div>
 
