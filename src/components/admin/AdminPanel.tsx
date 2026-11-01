@@ -12,7 +12,7 @@ import ProfileSection from "@/components/admin/ProfileSection"
 import SecuritySection from "@/components/admin/SecuritySection"
 import SocialsSection from "@/components/admin/SocialsSection"
 import ThemeSection from "@/components/admin/ThemeSection"
-import type { AdminMessage, LinkForm, ProfileField, SocialForm, ThemeFieldKey } from "@/components/admin/types"
+import { emptyLinkForm, type AdminMessage, type LinkForm, type ProfileField, type SocialForm, type ThemeFieldKey } from "@/components/admin/types"
 
 const defaultData: ProfileData = {
   name: "", bio: "", avatar: null, calendlyUrl: null,
@@ -32,7 +32,7 @@ export default function AdminPanel() {
   const [reloadKey, setReloadKey] = useState(0)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<AdminMessage | null>(null)
-  const [newLink, setNewLink] = useState<LinkForm>({ title: "", url: "", icon: "" })
+  const [newLink, setNewLink] = useState<LinkForm>(emptyLinkForm)
   const [newSocial, setNewSocial] = useState<SocialForm>({ platform: "", url: "" })
   const [showLinkForm, setShowLinkForm] = useState(false)
   const [editingLink, setEditingLink] = useState<string | null>(null)
@@ -129,7 +129,7 @@ export default function AdminPanel() {
   }
 
   function cancelLinkForm() {
-    setNewLink({ title: "", url: "", icon: "" })
+    setNewLink(emptyLinkForm)
     setShowLinkForm(false)
     setEditingLink(null)
   }
@@ -144,8 +144,8 @@ export default function AdminPanel() {
 
   function addLink() {
     if (!newLink.title || !newLink.url) return
-    const fields = { title: newLink.title, url: newLink.url, icon: newLink.icon || undefined }
-    setData((prev) => ({ ...prev, links: editingLink ? prev.links.map((link) => link.id === editingLink ? { ...link, ...fields } : link) : [...prev.links, { id: `link-${Date.now()}`, ...fields }] }))
+    const linkFields = { title: newLink.title, url: newLink.url, icon: newLink.icon || undefined }
+    setData((prev) => ({ ...prev, links: editingLink ? prev.links.map((link) => link.id === editingLink ? { ...link, ...linkFields } : link) : [...prev.links, { id: `link-${Date.now()}`, ...linkFields }] }))
     cancelLinkForm()
   }
 

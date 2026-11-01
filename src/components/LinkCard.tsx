@@ -3,16 +3,12 @@
 import { useState } from "react"
 import { ExternalLink } from "lucide-react"
 
-import { getLinkIcon } from "@/lib/link-icons"
+import LinkIcon from "@/components/LinkIcon"
+import type { Link } from "@/lib/validation"
 
-type LinkItem = {
-  title: string
-  url: string
-  icon?: string
-}
+type LinkItem = Pick<Link, "title" | "url" | "icon">
 
 export default function LinkCard({ title, url, icon }: LinkItem) {
-  const LeadingIcon = getLinkIcon(icon)?.icon
   const [tilt, setTilt] = useState({ x: 0, y: 0 })
   const [hovered, setHovered] = useState(false)
 
@@ -50,13 +46,11 @@ export default function LinkCard({ title, url, icon }: LinkItem) {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {LeadingIcon && (
-        <LeadingIcon
-          aria-hidden="true"
-          className="size-5 shrink-0"
-          style={{ color: "var(--text-secondary)" }}
-        />
-      )}
+      <LinkIcon
+        id={icon}
+        className="size-5 shrink-0"
+        style={{ color: "var(--text-secondary)" }}
+      />
       <span
         className="flex-1 text-center font-medium"
         style={{ color: "var(--text-primary)" }}
