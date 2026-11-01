@@ -49,6 +49,10 @@ export default function AdminPanel() {
     ;(async () => {
       try {
         const res = await fetch("/api/data")
+        if (res.status === 401) {
+          router.push("/admin/login")
+          return
+        }
         if (!res.ok) throw new Error()
         const json = await res.json()
         if (!cancelled) {
@@ -62,9 +66,10 @@ export default function AdminPanel() {
       }
     })()
     return () => { cancelled = true }
-  }, [reloadKey])
+  }, [reloadKey, router])
 
   function retryLoad() {
+    setLoadError(false)
     setLoading(true)
     setReloadKey((key) => key + 1)
   }

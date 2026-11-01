@@ -1,12 +1,12 @@
 import { createSession } from "@/lib/auth"
 import { checkRateLimit, getLoginRateLimitKey } from "@/lib/rate-limit"
-import { verifyAdminPassword, getAdminPasswordHash, matchesEnvPassword } from "@/lib/admin-auth"
+import { authenticateAdmin } from "@/lib/admin-auth"
 
 export async function POST(req: Request) {
   try {
     const rateLimitResult = await checkRateLimit(getLoginRateLimitKey(req))
     if (rateLimitResult === "unavailable") {
-      return Response.json({ error: "Login is temporarily unavailable" }, { status: 503 })
+      return Response.json({ error: "Inicio de sesión no disponible temporalmente" }, { status: 503 })
     }
     if (rateLimitResult === "limited") {
       return Response.json({ error: "Demasiados intentos. Intenta de nuevo en 1 minuto" }, { status: 429 })
@@ -17,18 +17,11 @@ export async function POST(req: Request) {
       return Response.json({ error: "Contraseña requerida" }, { status: 400 })
     }
 
-    let storedHash: string | null
-    try {
-      storedHash = await getAdminPasswordHash()
-    } catch {
-      return Response.json({ error: "Login is temporarily unavailable" }, { status: 503 })
+    const auth = await authenticateAdmin(password)
+    if (auth === "unavailable") {
+      return Response.json({ error: "Inicio de sesión no disponible temporalmente" }, { status: 503 })
     }
-
-    const valid = storedHash
-      ? await verifyAdminPassword(password)
-      : matchesEnvPassword(password)
-
-    if (!valid) {
+    if (auth === "invalid") {
       return Response.json({ error: "Contraseña incorrecta" }, { status: 401 })
     }
 

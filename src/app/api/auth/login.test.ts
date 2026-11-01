@@ -2,15 +2,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 
 vi.mock("@/lib/auth", () => ({ createSession: vi.fn() }))
 vi.mock("@/lib/rate-limit", () => ({ checkRateLimit: vi.fn(), getLoginRateLimitKey: vi.fn(() => "k") }))
-vi.mock("@/lib/admin-auth", () => ({
-  getAdminPasswordHash: vi.fn(),
-  verifyAdminPassword: vi.fn(),
-  matchesEnvPassword: vi.fn(),
-}))
+vi.mock("@/lib/admin-auth", () => ({ authenticateAdmin: vi.fn() }))
 
 import { createSession } from "@/lib/auth"
 import { checkRateLimit } from "@/lib/rate-limit"
-import { getAdminPasswordHash, matchesEnvPassword, verifyAdminPassword } from "@/lib/admin-auth"
+import { authenticateAdmin } from "@/lib/admin-auth"
 import { POST } from "@/app/api/auth/login/route"
 
 const login = (body: unknown) =>
@@ -34,25 +30,21 @@ describe("POST /api/auth/login", () => {
     expect((await login({})).status).toBe(400)
   })
 
-  it("does NOT fall back to ADMIN_PASSWORD when Redis fails", async () => {
-    vi.mocked(getAdminPasswordHash).mockRejectedValue(new Error("redis down"))
-    const res = await login({ password: "env-password" })
-    expect(res.status).toBe(503)
-    expect(matchesEnvPassword).not.toHaveBeenCalled()
+  it("returns 503 without creating a session when auth storage is unavailable", async () => {
+    vi.mocked(authenticateAdmin).mockResolvedValue("unavailable")
+    expect((await login({ password: "env-password" })).status).toBe(503)
     expect(createSession).not.toHaveBeenCalled()
   })
 
-  it("uses the env password only when no custom hash exists", async () => {
-    vi.mocked(getAdminPasswordHash).mockResolvedValue(null)
-    vi.mocked(matchesEnvPassword).mockReturnValue(true)
-    expect((await login({ password: "env-password" })).status).toBe(200)
+  it("creates a session when credentials are valid", async () => {
+    vi.mocked(authenticateAdmin).mockResolvedValue("ok")
+    expect((await login({ password: "good" })).status).toBe(200)
     expect(createSession).toHaveBeenCalled()
   })
 
-  it("ignores the env password once a custom hash is stored", async () => {
-    vi.mocked(getAdminPasswordHash).mockResolvedValue("salt:hash")
-    vi.mocked(verifyAdminPassword).mockResolvedValue(false)
-    expect((await login({ password: "env-password" })).status).toBe(401)
-    expect(matchesEnvPassword).not.toHaveBeenCalled()
+  it("returns 401 without a session for invalid credentials", async () => {
+    vi.mocked(authenticateAdmin).mockResolvedValue("invalid")
+    expect((await login({ password: "bad" })).status).toBe(401)
+    expect(createSession).not.toHaveBeenCalled()
   })
 })

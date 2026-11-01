@@ -27,6 +27,15 @@ describe("profile storage", () => {
     expect(redis.set).toHaveBeenCalledWith("profile", expect.any(String), { NX: true })
   })
 
+  it("returns the concurrent writer's data when the NX seed is skipped", async () => {
+    redis.get
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(JSON.stringify({ name: "Concurrent name", links: [], socials: [] }))
+    redis.set.mockResolvedValue(null)
+    const data = await readData()
+    expect(data.name).toBe("Concurrent name")
+  })
+
   it("rejects invalid JSON stored in Redis", async () => {
     redis.get.mockResolvedValue("{not json")
     await expect(readData()).rejects.toThrow(/invalid JSON/)

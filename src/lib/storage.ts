@@ -80,7 +80,12 @@ async function seedIfEmpty(): Promise<ProfileData> {
 
   if (fileData) {
     // NX: only seed if nobody wrote the key in the meantime.
-    await redis.set(REDIS_KEY, JSON.stringify(fileData), { NX: true })
+    const seeded = await redis.set(REDIS_KEY, JSON.stringify(fileData), { NX: true })
+    if (seeded) return fileData
+
+    // Someone else wrote the key first: return their data, not the stale seed.
+    const current = await redis.get(REDIS_KEY)
+    if (current) return normalizeRedisData(current, fileData)
     return fileData
   }
 

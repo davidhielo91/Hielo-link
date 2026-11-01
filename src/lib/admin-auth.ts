@@ -57,8 +57,23 @@ export async function setAdminPassword(password: string): Promise<void> {
   await redis.set(REDIS_KEY, await hashPassword(password))
 }
 
-export async function verifyAdminPassword(password: string): Promise<boolean> {
-  const stored = await getAdminPasswordHash()
-  if (!stored) return false
-  return verifyPassword(password, stored)
+export type AdminAuthResult = "ok" | "invalid" | "unavailable"
+
+/**
+ * Single source of truth for admin credential checks. A stored hash is
+ * authoritative; ADMIN_PASSWORD is only used when no hash exists.
+ * Reads Redis once and reports Redis failures as "unavailable".
+ */
+export async function authenticateAdmin(password: string): Promise<AdminAuthResult> {
+  let storedHash: string | null
+  try {
+    storedHash = await getAdminPasswordHash()
+  } catch {
+    return "unavailable"
+  }
+
+  const valid = storedHash !== null
+    ? await verifyPassword(password, storedHash)
+    : matchesEnvPassword(password)
+  return valid ? "ok" : "invalid"
 }

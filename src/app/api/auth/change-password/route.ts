@@ -1,5 +1,5 @@
 import { verifySession } from "@/lib/auth"
-import { verifyAdminPassword, setAdminPassword, getAdminPasswordHash, matchesEnvPassword } from "@/lib/admin-auth"
+import { authenticateAdmin, setAdminPassword } from "@/lib/admin-auth"
 
 export async function POST(req: Request) {
   const isAuth = await verifySession()
@@ -26,11 +26,11 @@ export async function POST(req: Request) {
       return Response.json({ error: "Las contraseñas nuevas no coinciden" }, { status: 400 })
     }
 
-    const storedHash = await getAdminPasswordHash()
-    const valid = storedHash
-      ? await verifyAdminPassword(currentPassword)
-      : matchesEnvPassword(currentPassword)
-    if (!valid) {
+    const auth = await authenticateAdmin(currentPassword)
+    if (auth === "unavailable") {
+      return Response.json({ error: "Servicio no disponible temporalmente. Intenta de nuevo" }, { status: 503 })
+    }
+    if (auth === "invalid") {
       return Response.json({ error: "Contraseña actual incorrecta" }, { status: 401 })
     }
 
